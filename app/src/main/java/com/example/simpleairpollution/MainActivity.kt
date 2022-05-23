@@ -25,6 +25,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
 import java.util.*
+import kotlin.math.roundToInt
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,14 +37,14 @@ class MainActivity : AppCompatActivity() {
     private var lon : String = ""
     private var lat : String = ""
 
-    var co = "" // 일산화 탄소
-    var no = "" // 일산화 질소
-    var no2 = "" // 이산화 질
-    var o3 = "" // 오존
-    var so2 = "" // 이산화 황 // 아황산가
-    var pm2_5 = "" // 초미세먼지
-    var pm10 = "" // 미세먼
-    var nh3 = "" // 암모니아
+    var co = 0.0 // 일산화 탄소
+    var no = 0.0 // 일산화 질소
+    var no2 = 0.0 // 이산화 질
+    var o3 = 0.0 // 오존
+    var so2 = 0.0 // 이산화 황 // 아황산가
+    var pm2_5 = 0.0 // 초미세먼지
+    var pm10 = 0.0 // 미세먼
+    var nh3 = 0.0 // 암모니아
     var aqi = 0 // 전체 공기질
     var address = ""
 
@@ -61,6 +62,7 @@ class MainActivity : AppCompatActivity() {
         requestPermission()
 
         val url3 = "http://api.openweathermap.org/data/2.5/air_pollution?lat=37.4856933&lon=127.1191588&appid=3bbea22f826e4eef49dc445bd1114a75"
+        val url4 = "api.openweathermap.org/data/2.5/forecast?lat=37.4856933&lon=127.1191588&appid=3bbea22f826e4eef49dc445bd1114a75"
 
 
     }
@@ -92,41 +94,86 @@ class MainActivity : AppCompatActivity() {
 
                     Log.d("testt aqi","${mainList?.get(0)?.main?.aqi}")
 
-                    co = mainList?.get(0)?.components?.co.toString()
-                    nh3 = mainList?.get(0)?.components?.nh3.toString()
-                    no = mainList?.get(0)?.components?.no.toString()
-                    no2 = mainList?.get(0)?.components?.no2.toString()
-                    o3 = mainList?.get(0)?.components?.o3.toString()
-                    pm10 = mainList?.get(0)?.components?.pm10.toString()
-                    pm2_5 = mainList?.get(0)?.components?.pm2_5.toString()
-                    so2 = mainList?.get(0)?.components?.so2.toString()
+                    co = mainList?.get(0)?.components?.co!!.toDouble()
+                    nh3 = mainList?.get(0)?.components?.nh3.toDouble()
+                    no = mainList?.get(0)?.components?.no.toDouble()
+                    no2 = mainList?.get(0)?.components?.no2.toDouble()
+                    o3 = mainList?.get(0)?.components?.o3.toDouble()
+                    pm10 = mainList?.get(0)?.components?.pm10.toDouble()
+                    pm2_5 = mainList?.get(0)?.components?.pm2_5.toDouble()
+                    so2 = mainList?.get(0)?.components?.so2.toDouble()
                     aqi = mainList?.get(0)?.main?.aqi!!.toInt()
 
-                    binding.pm10.text = "미세먼지 : $pm10"
-                    binding.pm25.text = "초미세먼지 : $pm2_5"
-                    binding.no.text = "일산화질소 : $no"
-                    binding.co.text = "일산화탄소 : $co"
-                    binding.o3.text = "오존 : $o3"
-                    binding.so2.text = "아황산가스 : $so2"
+                    binding.pm10.text = "미세먼지 : ${pm10} μg/m3"
+                    binding.pm25.text = "초미세먼지 : ${pm2_5} μg/m3"
+                    binding.no.text = "일산화질소 : $no μg/m3"
+                    binding.co.text = "일산화탄소 : $co μg/m3"
+                    binding.o3.text = "오존 : $o3 μg/m3"
+                    binding.so2.text = "아황산가스 : $so2 μg/m3"
 
                     when(aqi) {
                         1 -> {
                             binding.airQuality.text = "좋음"
+                            binding.mainImage.text = "😆"
+                            binding.constraintlayout.setBackgroundResource(R.color.blue)
                         }
                         2 -> {
                             binding.airQuality.text = "보통"
+                            binding.mainImage.text = "🙂"
+                            binding.constraintlayout.setBackgroundResource(R.color.green)
                         }
                         3 -> {
                             binding.airQuality.text = "나쁨"
+                            binding.mainImage.text = "🙁"
+                            binding.constraintlayout.setBackgroundResource(R.color.yellow)
                         }
                         4 -> {
                             binding.airQuality.text = "매우나쁨"
+                            binding.mainImage.text = "😫"
+                            binding.constraintlayout.setBackgroundResource(R.color.red)
+                        }
+                        5 -> {
+                            binding.airQuality.text = "매우나쁨"
+                            binding.mainImage.text = "😫"
+                            binding.constraintlayout.setBackgroundResource(R.color.red)
                         }
                         else -> {
-                            binding.airQuality.text = "데이터 없"
+                            binding.airQuality.text = "데이터 없음"
+                            binding.mainImage.text = "🧐"
+                            binding.constraintlayout.setBackgroundResource(R.color.gray)
                         }
 
                     }
+
+                    if(pm10 > 0 && pm10 <= 25) {
+                        binding.pm10Image.text = "\uD83D\uDE06"
+                    } else if(pm10 > 25 && pm10 <= 50) {
+                        binding.pm10Image.text = "\uD83D\uDE42"
+                    } else if(pm10 > 50 && pm10 <= 90) {
+                        binding.pm10Image.text = "\uD83D\uDE41"
+                    } else if(pm10 > 90 && pm10 <= 180) {
+                        binding.pm10Image.text = "\uD83D\uDE2B"
+                    } else if(pm10 > 181){
+                        binding.pm10Image.text = "😱"
+                    } else {
+                        binding.pm10Image.text = "\uD83E\uDDD0"
+                    }
+
+                    if(pm2_5 > 0 && pm2_5 <= 15) {
+                        binding.pm25Image.text = "\uD83D\uDE06"
+                    } else if(pm2_5 > 15 && pm2_5 <= 30) {
+                        binding.pm25Image.text = "\uD83D\uDE42"
+                    } else if(pm2_5 > 30 && pm2_5 <= 55) {
+                        binding.pm25Image.text = "\uD83D\uDE41"
+                    } else if(pm2_5 > 55 && pm2_5 <= 110) {
+                        binding.pm25Image.text = "\uD83D\uDE2B"
+                    } else if(pm2_5 > 110){
+                        binding.pm25Image.text = "😱"
+                    } else {
+                        binding.pm25Image.text = "\uD83E\uDDD0"
+                    }
+
+
 
 
                     binding.progressBar.visibility = View.GONE
@@ -186,18 +233,10 @@ class MainActivity : AppCompatActivity() {
 
                     Log.d("testt getAddressLine","${address[0].getAddressLine(0)}")
                     Log.d("testt locality","${address[0].locality}")
-                    Log.d("testt locale","${address[0].locale}")
                     Log.d("testt adminArea","${address[0].adminArea}") // 서울특별시
-                    Log.d("testt subAdminArea","${address[0].subAdminArea}")
-                    Log.d("testt featureName","${address[0].featureName}")
                     Log.d("testt subLocality","${address[0].subLocality}") // 송파구
                     Log.d("testt subThoroughfare","${address[0].subThoroughfare}") // 201
                     Log.d("testt thoroughfare","${address[0].thoroughfare}") // 문정동
-                    Log.d("testt extras","${address[0].extras}")
-                    Log.d("testt phone","${address[0].phone}")
-                    Log.d("testt postalCode","${address[0].postalCode}")
-                    Log.d("testt premises","${address[0].premises}")
-                    Log.d("testt address","${address[0]}")
 
                     binding.addressDong.text = address[0].thoroughfare
                     binding.address.text = address[0].getAddressLine(0)

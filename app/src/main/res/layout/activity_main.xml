@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/constraintlayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
@@ -50,7 +51,7 @@
             android:id="@+id/linear1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_margin="15dp"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -59,19 +60,37 @@
             <TextView
                 android:id="@+id/pm10"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="20dp"
                 android:layout_weight="1"
                 android:gravity="center_horizontal"
                 android:text="미세먼지 : 1234"
+                android:textSize="16dp" />
+
+            <TextView
+                android:id="@+id/pm10_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:gravity="center_horizontal"
+                android:text="😀"
                 android:textSize="18dp" />
 
             <TextView
                 android:id="@+id/pm2_5"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="20dp"
                 android:layout_weight="1"
                 android:gravity="center_horizontal"
                 android:text="초 미세먼지 : 1234"
+                android:textSize="16dp" />
+
+            <TextView
+                android:id="@+id/pm2_5_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:gravity="center_horizontal"
+                android:text="😀"
                 android:textSize="18dp" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
@@ -107,7 +126,6 @@
                 android:layout_weight="1"
                 android:text="일산화탄소"
                 android:textSize="20dp" />
-
 
             <TextView
                 android:id="@+id/no"
@@ -153,13 +171,13 @@
 
         <TextView
             android:id="@+id/address"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/line2"
-            android:layout_margin="15dp"
-            android:textSize="18dp"
-            android:text="1q2w3e4r"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:text="1q2w3e4r"
+            android:textSize="18dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/line2" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
