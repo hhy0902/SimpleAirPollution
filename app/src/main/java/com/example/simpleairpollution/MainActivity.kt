@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -24,6 +25,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
+import java.lang.Exception
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -65,6 +67,56 @@ class MainActivity : AppCompatActivity() {
         val url4 = "api.openweathermap.org/data/2.5/forecast?lat=37.4856933&lon=127.1191588&appid=3bbea22f826e4eef49dc445bd1114a75"
 
 
+    }
+
+    private fun bindViews() {
+        binding.refresh.setOnRefreshListener {
+            fetchAirPollution()
+            getAirPollution()
+            //binding.refresh.isRefreshing = false
+            Log.d("testt refresh","refresh")
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun fetchAirPollution() {
+        cancellationTokenSource = CancellationTokenSource()
+        fusedLocationProviderClient.getCurrentLocation(
+            LocationRequest.PRIORITY_HIGH_ACCURACY,
+            cancellationTokenSource!!.token
+
+        ).addOnSuccessListener { location ->
+            try {
+                lat = location.latitude.toString()
+                lon = location.longitude.toString()
+                Log.d("testt", "$lat / $lon")
+
+                geocoder = Geocoder(this, Locale.getDefault())
+
+                val address = geocoder.getFromLocation(lat.toDouble(), lon.toDouble(), 1)
+
+                Log.d("testt getAddressLine","${address[0].getAddressLine(0)}")
+                Log.d("testt adminArea","${address[0].adminArea}") // 서울특별시
+                Log.d("testt subLocality","${address[0].subLocality}") // 송파구
+                Log.d("testt subThoroughfare","${address[0].subThoroughfare}") // 201
+                Log.d("testt thoroughfare","${address[0].thoroughfare}") // 문정동
+
+                binding.addressDong.text = "${address[0].subLocality} ${address[0].thoroughfare}"
+                binding.address.text = address[0].getAddressLine(0)
+
+                getAirPollution()
+
+                bindViews()
+
+                //binding.refresh.isRefreshing = false
+
+            } catch (e : Exception) {
+                e.printStackTrace()
+                Toast.makeText(this,"error 발생 다시 시도", Toast.LENGTH_SHORT).show()
+            } finally {
+                binding.refresh.isRefreshing = false
+            }
+        }
     }
 
     private fun getAirPollution() {
@@ -173,9 +225,6 @@ class MainActivity : AppCompatActivity() {
                         binding.pm25Image.text = "\uD83E\uDDD0"
                     }
 
-
-
-
                     binding.progressBar.visibility = View.GONE
 
                     binding.constraintlayout2.visibility = View.VISIBLE
@@ -186,7 +235,6 @@ class MainActivity : AppCompatActivity() {
             override fun onFailure(call: Call<Pollution>, t: Throwable) {
                 Log.d("testt","${t.message}")
             }
-
         })
     }
 
@@ -215,34 +263,7 @@ class MainActivity : AppCompatActivity() {
                 grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                 Log.d("testt", "승낙")
 
-                cancellationTokenSource = CancellationTokenSource()
-
-                fusedLocationProviderClient.getCurrentLocation(
-                    LocationRequest.PRIORITY_HIGH_ACCURACY,
-                    cancellationTokenSource!!.token
-
-                ).addOnSuccessListener { location ->
-                    //binding.textView.text = "${location.latitude} / ${location.longitude}"
-                    lat = location.latitude.toString()
-                    lon = location.longitude.toString()
-                    Log.d("testt", "$lat / $lon")
-
-                    geocoder = Geocoder(this, Locale.getDefault())
-
-                    val address = geocoder.getFromLocation(lat.toDouble(), lon.toDouble(), 1)
-
-                    Log.d("testt getAddressLine","${address[0].getAddressLine(0)}")
-                    Log.d("testt locality","${address[0].locality}")
-                    Log.d("testt adminArea","${address[0].adminArea}") // 서울특별시
-                    Log.d("testt subLocality","${address[0].subLocality}") // 송파구
-                    Log.d("testt subThoroughfare","${address[0].subThoroughfare}") // 201
-                    Log.d("testt thoroughfare","${address[0].thoroughfare}") // 문정동
-
-                    binding.addressDong.text = address[0].thoroughfare
-                    binding.address.text = address[0].getAddressLine(0)
-
-                    getAirPollution()
-                }
+                fetchAirPollution()
 
             } else {
                 Log.d("testt", "거부")
